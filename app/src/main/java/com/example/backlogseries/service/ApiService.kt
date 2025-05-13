@@ -22,3 +22,4 @@ interface ApiService {
         @Query("page") page: Int = 1
     ): SerieResponse
 }
+

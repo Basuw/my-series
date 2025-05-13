@@ -9,11 +9,13 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.lifecycleScope
 import com.example.backlogseries.model.Serie
 import com.example.backlogseries.serie.SerieScreenActivity
 import com.example.backlogseries.serie.TopRatedSeriesScreen
 import com.example.backlogseries.service.SerieService
 import com.example.backlogseries.ui.theme.BacklogSeriesTheme
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -26,7 +28,7 @@ class MainActivity : ComponentActivity() {
                     TopRatedSeriesScreen(
                         serieService = serieService,
                         onSerieClick = { serie ->
-                            navigateToSerieScreen(serie)
+                            fetchAndNavigateToSerieDetails(serieService, serie)
                         },
                         modifier = Modifier.padding(innerPadding)
                     )
@@ -35,12 +37,22 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    private fun fetchAndNavigateToSerieDetails(serieService: SerieService, serie: Serie) {
+        lifecycleScope.launch {
+            try {
+                val updatedSerie = serieService.getSerieDetails(serie.id) // Appel API pour récupérer les détails
+                Log.d("MainActivity", "Fetched serie details: $updatedSerie")
+                navigateToSerieScreen(updatedSerie) // Navigation avec la série mise à jour
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
+
     private fun navigateToSerieScreen(serie: Serie) {
         val intent = Intent(this, SerieScreenActivity::class.java).apply {
             putExtra("serie", serie)
         }
-        //log la serie
-        Log.d("serie", serie.toString()) //
         startActivity(intent)
     }
 }
