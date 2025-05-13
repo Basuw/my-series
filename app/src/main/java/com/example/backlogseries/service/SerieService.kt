@@ -27,4 +27,8 @@ class SerieService(context: Context) {
     suspend fun getTopRatedSeries(): SerieResponse {
         return apiService.getTopRatedSeries(bearerToken)
     }
+
+    suspend fun searchSeries(query: String): List<Serie> {
+        return apiService.searchSeries(bearerToken, query).results
+    }
 }

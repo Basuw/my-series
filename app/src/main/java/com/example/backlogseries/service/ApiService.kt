@@ -21,5 +21,12 @@ interface ApiService {
         @Query("language") language: String = "en-US",
         @Query("page") page: Int = 1
     ): SerieResponse
-}
 
+    @GET("search/tv")
+    suspend fun searchSeries(
+        @Header("Authorization") authorization: String,
+        @Query("query") query: String,
+        @Query("language") language: String = "en-US",
+        @Query("page") page: Int = 1
+    ): SerieResponse
+}
