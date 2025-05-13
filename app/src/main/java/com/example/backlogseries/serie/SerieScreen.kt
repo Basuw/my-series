@@ -82,11 +82,13 @@ fun SerieScreen(serie: Serie) {
 
         // Temps de visionnage total
         val totalRuntime = serie.getTotalRuntime()
-        Text(
-            text = "Temps de visionnage total : ${totalRuntime / 60}h ${totalRuntime % 60}min",
-            fontSize = 16.sp,
-            color = Color.Gray
-        )
+        if (totalRuntime != null) {
+            Text(
+                text = "Temps de visionnage total : ${totalRuntime / 60}h ${totalRuntime % 60}min",
+                fontSize = 16.sp,
+                color = Color.Gray
+            )
+        }
 
         // Synopsis
         Text(
