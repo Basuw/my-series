@@ -1,5 +1,7 @@
 package com.example.backlogseries.model
 
+import java.io.Serializable
+
 data class Season(
     val id: Int,
     val name: String,
@@ -9,4 +11,4 @@ data class Season(
     val seasonNumber: Int,
     val posterPath: String?,
     val voteAverage: Double,
-)
+) : Serializable

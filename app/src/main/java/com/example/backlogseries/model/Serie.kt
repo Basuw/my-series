@@ -1,5 +1,7 @@
 package com.example.backlogseries.model
 
+import java.io.Serializable
+
 data class Serie(
     val id: Int,
     val name: String,
@@ -26,7 +28,7 @@ data class Serie(
     val backdropPath: String?,
     val homepage: String?,
     val inProduction: Boolean
-)
+) : Serializable
 
 fun Serie.getTotalRuntime(): Int? {
     val runtimePerEpisode = episodeRunTime?.firstOrNull() ?: lastEpisodeToAir?.runtime
@@ -39,3 +41,4 @@ data class SerieResponse(
     val totalPages: Int,
     val totalResults: Int
 )
+

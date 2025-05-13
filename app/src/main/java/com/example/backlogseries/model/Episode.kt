@@ -1,5 +1,7 @@
 package com.example.backlogseries.model
 
+import java.io.Serializable
+
 data class Episode(
     val id: Int,
     val name: String,
@@ -14,4 +16,4 @@ data class Episode(
     val seasonNumber: Int,
     val showId: Int,
     val stillPath: String?
-)
+) : Serializable

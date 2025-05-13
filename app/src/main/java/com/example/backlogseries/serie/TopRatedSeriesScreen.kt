@@ -26,14 +26,18 @@ import com.example.backlogseries.service.SerieService
 
 
 @Composable
-fun TopRatedSeriesScreen(serieService: SerieService, onSerieClick: (Serie) -> Unit) {
+fun TopRatedSeriesScreen(
+    serieService: SerieService,
+    onSerieClick: (Serie) -> Unit,
+    modifier: Modifier = Modifier // Ajout du paramètre modifier
+) {
     val series = remember { mutableStateOf<List<Serie>>(emptyList()) }
 
     LaunchedEffect(Unit) {
         series.value = serieService.getTopRatedSeries().results
     }
 
-    LazyColumn(modifier = Modifier.fillMaxSize()) {
+    LazyColumn(modifier = modifier.fillMaxSize()) { // Utilisation du modifier ici
         items(series.value) { serie ->
             Card(
                 modifier = Modifier
