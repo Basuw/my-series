@@ -32,3 +32,10 @@ fun Serie.getTotalRuntime(): Int? {
     val runtimePerEpisode = episodeRunTime?.firstOrNull() ?: lastEpisodeToAir?.runtime
     return runtimePerEpisode?.let { it * numberOfEpisodes }
 }
+
+data class SerieResponse(
+    val page: Int,
+    val results: List<Serie>,
+    val totalPages: Int,
+    val totalResults: Int
+)

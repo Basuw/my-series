@@ -1,6 +1,7 @@
 package com.example.backlogseries.service
 
 import com.example.backlogseries.model.Serie
+import com.example.backlogseries.model.SerieResponse
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.Path
@@ -13,4 +14,11 @@ interface ApiService {
         @Path("id") id: Int,
         @Query("language") language: String = "en-US"
     ): Serie
+
+    @GET("tv/top_rated")
+    suspend fun getTopRatedSeries(
+        @Header("Authorization") authorization: String,
+        @Query("language") language: String = "en-US",
+        @Query("page") page: Int = 1
+    ): SerieResponse
 }
