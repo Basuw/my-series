@@ -1,5 +1,6 @@
 package com.example.backlogseries.model
 
+import android.util.Log
 import java.io.Serializable
 
 data class Serie(
@@ -9,7 +10,7 @@ data class Serie(
     val overview: String,
     val first_air_date: String,
     val last_air_date: String?,
-    val lastEpisodeToAir: Episode?,
+    val last_episode_to_air: Episode?,
     val episode_run_time: List<Int>?,
     val number_of_seasons: Int,
     val number_of_episodes: Int,
@@ -31,8 +32,14 @@ data class Serie(
 ) : Serializable
 
 fun Serie.getTotalRuntime(): Int? {
-    val runtimePerEpisode = episode_run_time?.firstOrNull() ?: lastEpisodeToAir?.runtime
-    return runtimePerEpisode?.let { it * number_of_episodes }
+    if (episode_run_time.isNullOrEmpty()){
+        val runtimePerEpisode = episode_run_time?.firstOrNull() ?: last_episode_to_air?.runtime
+        Log.d("runtime calculated", "Runtime per episode: $runtimePerEpisode")
+        return runtimePerEpisode?.let { it * number_of_episodes }
+    }else{
+        Log.d("runtime fetched", "Runtime per episode: ")
+        return this.episode_run_time[0]
+    }
 }
 
 data class SerieResponse(
