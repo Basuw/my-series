@@ -2,6 +2,7 @@ package com.example.backlogseries
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -38,6 +39,8 @@ class MainActivity : ComponentActivity() {
         val intent = Intent(this, SerieScreenActivity::class.java).apply {
             putExtra("serie", serie)
         }
+        //log la serie
+        Log.d("serie", serie.toString()) //
         startActivity(intent)
     }
 }

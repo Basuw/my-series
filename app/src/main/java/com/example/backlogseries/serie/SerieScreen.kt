@@ -1,6 +1,5 @@
 package com.example.backlogseries.serie
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
@@ -33,7 +32,7 @@ fun SerieScreen(serie: Serie) {
                 .height(200.dp)
         ) {
             AsyncImage(
-                model = "https://image.tmdb.org/t/p/w500${serie.backdropPath}",
+                model = "https://image.tmdb.org/t/p/w500${serie.backdrop_path}",
                 contentDescription = "Backdrop Image",
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxSize()
@@ -53,29 +52,34 @@ fun SerieScreen(serie: Serie) {
                 modifier = Modifier.weight(1f)
             )
             Text(
-                text = "⭐ ${serie.voteAverage} (${serie.voteCount})",
+                text = "⭐ ${serie.vote_average} (${serie.vote_count})",
                 fontSize = 16.sp,
                 color = Color.Gray
             )
         }
 
         // Genres
+        val genresText = if (!serie.genres.isNullOrEmpty()) {
+            "Genres: ${serie.genres.joinToString(", ") { it.name }}"
+        } else {
+            "Genres: Non disponible"
+        }
         Text(
-            text = "Genres: ${serie.genres.joinToString(", ") { it.name }}",
+            text = genresText,
             fontSize = 16.sp,
             color = Color.Gray
         )
 
         // Date de sortie
         Text(
-            text = "Première diffusion : ${serie.firstAirDate}",
+            text = "Première diffusion : ${serie.first_air_date}",
             fontSize = 16.sp,
             color = Color.Gray
         )
 
         // Nombre de saisons et d'épisodes
         Text(
-            text = "Saisons : ${serie.numberOfSeasons}, Épisodes : ${serie.numberOfEpisodes}",
+            text = "Saisons : ${serie.number_of_seasons}, Épisodes : ${serie.number_of_episodes}",
             fontSize = 16.sp,
             color = Color.Gray
         )

@@ -16,6 +16,13 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.BacklogSeries"
         tools:targetApi="31">
+        
+        <!-- Déclaration de l'activité SerieScreenActivity -->
+        <activity
+            android:name=".serie.SerieScreenActivity"
+            android:exported="true"
+            android:label="Serie Details" />
+
         <activity
             android:name=".MainActivity"
             android:exported="true"

@@ -33,28 +33,32 @@ fun TopRatedSeriesScreen(
 ) {
     val series = remember { mutableStateOf<List<Serie>>(emptyList()) }
 
-    LaunchedEffect(Unit) {
-        series.value = serieService.getTopRatedSeries().results
-    }
+    Column {
+        LaunchedEffect(Unit) {
+            series.value = serieService.getTopRatedSeries().results
+        }
+        // Affichage de la liste des séries
+        Text(text = "Top Rated Series", fontWeight = FontWeight.Bold, modifier = Modifier.padding(8.dp))
 
-    LazyColumn(modifier = modifier.fillMaxSize()) { // Utilisation du modifier ici
-        items(series.value) { serie ->
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(8.dp)
-                    .clickable { onSerieClick(serie) }
-            ) {
-                Row(modifier = Modifier.padding(8.dp)) {
-                    AsyncImage(
-                        model = "https://image.tmdb.org/t/p/w200${serie.posterPath}",
-                        contentDescription = "Poster",
-                        modifier = Modifier.size(100.dp)
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Column {
-                        Text(text = serie.name, fontWeight = FontWeight.Bold)
-                        Text(text = "⭐ ${serie.voteAverage}")
+        LazyColumn(modifier = modifier.fillMaxSize()) { // Utilisation du modifier ici
+            items(series.value) { serie ->
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp)
+                        .clickable { onSerieClick(serie) }
+                ) {
+                    Row(modifier = Modifier.padding(8.dp)) {
+                        AsyncImage(
+                            model = "https://image.tmdb.org/t/p/w200${serie.poster_path}",
+                            contentDescription = "Poster",
+                            modifier = Modifier.size(100.dp)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Column {
+                            Text(text = serie.name, fontWeight = FontWeight.Bold)
+                            Text(text = "⭐ ${serie.vote_average}")
+                        }
                     }
                 }
             }
