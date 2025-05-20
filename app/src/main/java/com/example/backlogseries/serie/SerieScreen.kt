@@ -2,6 +2,7 @@ package com.example.backlogseries.serie
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -19,7 +20,11 @@ import com.example.backlogseries.model.Serie
 import com.example.backlogseries.model.getTotalRuntime
 
 @Composable
-fun SerieScreen(serie: Serie) {
+fun SerieScreen(
+    serie: Serie, 
+    isInWatchlist: Boolean = false,
+    onAddToWatchlist: () -> Unit = {}
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -57,6 +62,23 @@ fun SerieScreen(serie: Serie) {
                 text = "⭐ ${serie.vote_average} (${serie.vote_count})",
                 fontSize = 16.sp,
                 color = Color.Gray
+            )
+        }
+        
+        // Bouton d'ajout à la liste de lecture
+        if (!isInWatchlist) {
+            Button(
+                onClick = { onAddToWatchlist() },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(text = "Ajouter à ma liste de lecture")
+            }
+        } else {
+            Text(
+                text = "✓ Dans ma liste de lecture",
+                fontSize = 16.sp,
+                color = Color.Green,
+                modifier = Modifier.padding(8.dp)
             )
         }
 
