@@ -25,9 +25,6 @@ fun WatchlistScreen(
     onRemoveSerie: (WatchlistSerie) -> Unit,
     onUpdateSettings: (index: Int, episodesPerDay: Int, episodesPerWeek: Int, minutesPerDay: Int) -> Unit
 ) {
-    var editingIndex by remember { mutableStateOf(-1) }
-    var showEditDialog by remember { mutableStateOf(false) }
-    
     Column {
         if (watchlist.isEmpty()) {
             Box(
@@ -37,10 +34,6 @@ fun WatchlistScreen(
                 Text(text = "Votre liste de lecture est vide")
             }
         } else {
-            // Statistiques de visionnage
-            WatchlistStats(watchlist)
-            
-            // Liste des séries
             LazyColumn {
                 itemsIndexed(watchlist) { index, watchlistSerie ->
                     WatchlistSerieItem(
@@ -48,103 +41,9 @@ fun WatchlistScreen(
                         onClick = { onSerieClick(watchlistSerie) },
                         onRemove = { onRemoveSerie(watchlistSerie) },
                         onEdit = {
-                            editingIndex = index
-                            showEditDialog = true
+                            onUpdateSettings(index, watchlistSerie.episodesPerDay, watchlistSerie.episodesPerWeek, watchlistSerie.minutesPerDay)
                         }
                     )
-                }
-            }
-        }
-    }
-    
-    // Dialogue d'édition des paramètres de visionnage
-    if (showEditDialog && editingIndex >= 0 && editingIndex < watchlist.size) {
-        val watchlistSerie = watchlist[editingIndex]
-        var episodesPerDay by remember { mutableStateOf(watchlistSerie.episodesPerDay) }
-        var episodesPerWeek by remember { mutableStateOf(watchlistSerie.episodesPerWeek) }
-        var minutesPerDay by remember { mutableStateOf(watchlistSerie.minutesPerDay) }
-        
-        Dialog(
-            onDismissRequest = { showEditDialog = false }
-        ) {
-            Card(
-                modifier = Modifier.padding(16.dp),
-            ) {
-                Column(
-                    modifier = Modifier
-                        .padding(16.dp)
-                        .fillMaxWidth()
-                ) {
-                    Text(
-                        text = "Planifier le visionnage de ${watchlistSerie.serie.name}",
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(bottom = 16.dp)
-                    )
-                    
-                    // Paramètres de visionnage
-                    Text(text = "Épisodes par jour :")
-                    Slider(
-                        value = episodesPerDay.toFloat(),
-                        onValueChange = { episodesPerDay = it.roundToInt() },
-                        valueRange = 1f..10f,
-                        steps = 9
-                    )
-                    Text(text = "$episodesPerDay épisodes/jour")
-                    
-                    Spacer(modifier = Modifier.height(16.dp))
-                    
-                    Text(text = "Épisodes par semaine :")
-                    Slider(
-                        value = episodesPerWeek.toFloat(),
-                        onValueChange = { episodesPerWeek = it.roundToInt() },
-                        valueRange = 1f..30f,
-                        steps = 29
-                    )
-                    Text(text = "$episodesPerWeek épisodes/semaine")
-                    
-                    Spacer(modifier = Modifier.height(16.dp))
-                    
-                    Text(text = "Minutes par jour :")
-                    Slider(
-                        value = minutesPerDay.toFloat(),
-                        onValueChange = { minutesPerDay = it.roundToInt() },
-                        valueRange = 30f..240f,
-                        steps = 7
-                    )
-                    Text(text = "$minutesPerDay minutes/jour")
-                    
-                    Spacer(modifier = Modifier.height(16.dp))
-                    
-                    // Résumé du planning
-                    val daysToComplete = WatchlistSerie(
-                        watchlistSerie.serie,
-                        episodesPerWeek,
-                        episodesPerDay,
-                        minutesPerDay
-                    ).getDaysToComplete()
-                    
-                    Text(
-                        text = "Avec ces paramètres, vous finirez cette série en $daysToComplete jours",
-                        fontWeight = FontWeight.Bold
-                    )
-                    
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 16.dp),
-                        horizontalArrangement = Arrangement.End
-                    ) {
-                        TextButton(onClick = { showEditDialog = false }) {
-                            Text("Annuler")
-                        }
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Button(onClick = {
-                            onUpdateSettings(editingIndex, episodesPerDay, episodesPerWeek, minutesPerDay)
-                            showEditDialog = false
-                        }) {
-                            Text("Enregistrer")
-                        }
-                    }
                 }
             }
         }

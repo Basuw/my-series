@@ -27,26 +27,17 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
-    // Liste de lecture partagée entre les activités
+    // Liste de séries sauvegardées
     private val watchlist = mutableStateListOf<WatchlistSerie>()
-    // Gestionnaire de stockage pour la liste de lecture
-    private lateinit var watchlistStorage: WatchlistStorage
-    
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        
-        // Initialiser le gestionnaire de stockage et charger la liste
-        watchlistStorage = WatchlistStorage(this)
-        loadWatchlist()
-        
+
         setContent {
             BacklogSeriesTheme {
-                val serieService = SerieService(this)
-                var searchQuery by remember { mutableStateOf(TextFieldValue("")) }
-                var searchResults by remember { mutableStateOf<List<Serie>>(emptyList()) }
                 var selectedTab by remember { mutableStateOf(0) }
-                
+
                 Column(modifier = Modifier.padding(10.dp)) {
                     // Navigation par onglets
                     TabRow(selectedTabIndex = selectedTab) {
@@ -58,49 +49,23 @@ class MainActivity : ComponentActivity() {
                         Tab(
                             selected = selectedTab == 1,
                             onClick = { selectedTab = 1 },
-                            text = { Text("Liste de lecture") }
+                            text = { Text("Ma liste de lecture") }
                         )
                     }
-                    
+
                     // Contenu basé sur l'onglet sélectionné
                     when (selectedTab) {
                         0 -> {
                             // Onglet Découvrir
-                            // Barre de recherche
-                            SearchBar(
-                                query = searchQuery,
-                                onQueryChanged = { query ->
-                                    searchQuery = query
-                                    if (query.text.isNotEmpty()) {
-                                        lifecycleScope.launch {
-                                            delay(300) // Ajout d'un délai pour éviter les appels excessifs
-                                            searchResults = serieService.searchSeries(query.text)
-                                        }
-                                    } else {
-                                        searchResults = emptyList()
-                                    }
+                            TopRatedSeriesScreen(
+                                serieService = SerieService(this@MainActivity),
+                                onSerieClick = { serie ->
+                                    navigateToSerieScreen(serie)
                                 }
                             )
-
-                            // Affichage des résultats de recherche ou des séries les mieux notées
-                            if (searchQuery.text.isNotEmpty()) {
-                                TopRatedSeriesScreen(
-                                    series = searchResults,
-                                    onSerieClick = { serie ->
-                                        fetchAndNavigateToSerieDetails(serieService, serie)
-                                    }
-                                )
-                            } else {
-                                TopRatedSeriesScreen(
-                                    serieService = serieService,
-                                    onSerieClick = { serie ->
-                                        fetchAndNavigateToSerieDetails(serieService, serie)
-                                    }
-                                )
-                            }
                         }
                         1 -> {
-                            // Onglet Liste de lecture
+                            // Onglet Ma liste de lecture
                             WatchlistScreen(
                                 watchlist = watchlist,
                                 onSerieClick = { watchlistSerie ->
@@ -120,68 +85,43 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    // Charger la liste de lecture depuis le stockage
-    private fun loadWatchlist() {
-        watchlist.clear()
-        watchlist.addAll(watchlistStorage.loadWatchlist())
-        Log.d("MainActivity", "Liste de lecture chargée: ${watchlist.size} séries")
-    }
-    
-    // Ajouter une série à la liste de lecture
-    private fun addToWatchlist(serie: Serie): Boolean {
-        val result = watchlistStorage.addSerieToWatchlist(watchlist, serie)
-        Log.d("MainActivity", "Ajout à la liste de lecture: $result")
-        return result
-    }
-    
-    // Supprimer une série de la liste de lecture
-    private fun removeFromWatchlist(watchlistSerie: WatchlistSerie) {
-        watchlistStorage.removeSerieFromWatchlist(watchlist, watchlistSerie.serie.id)
-        Log.d("MainActivity", "Série supprimée de la liste de lecture")
-    }
-    
-    // Mettre à jour les paramètres d'une série dans la liste de lecture
-    private fun updateWatchlistSettings(index: Int, episodesPerDay: Int, episodesPerWeek: Int, minutesPerDay: Int) {
-        watchlistStorage.updateWatchlistSettings(watchlist, index, episodesPerDay, episodesPerWeek, minutesPerDay)
-        Log.d("MainActivity", "Paramètres de visionnage mis à jour")
-    }
-
-    private fun fetchAndNavigateToSerieDetails(serieService: SerieService, serie: Serie) {
-        lifecycleScope.launch {
-            try {
-                val updatedSerie = serieService.getSerieDetails(serie.id) // Appel API pour récupérer les détails
-                Log.d("MainActivity", "Fetched serie details: $updatedSerie")
-                navigateToSerieScreen(updatedSerie) // Navigation avec la série mise à jour
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-        }
-    }
-
     private fun navigateToSerieScreen(serie: Serie) {
         val intent = Intent(this, SerieScreenActivity::class.java).apply {
             putExtra("serie", serie)
-            // Check if serie is already in watchlist
-            val isInWatchlist = watchlist.any { it.serie.id == serie.id }
-            putExtra("isInWatchlist", isInWatchlist)
-            putExtra("watchlistSize", watchlist.size)
+            putExtra("isInWatchlist", watchlist.any { it.serie.id == serie.id })
         }
         startActivityForResult(intent, ADD_TO_WATCHLIST_REQUEST_CODE)
     }
-    
-    // Méthode pour récupérer le résultat de SerieScreenActivity
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == ADD_TO_WATCHLIST_REQUEST_CODE && resultCode == RESULT_OK && data != null) {
             val serie = data.getSerializableExtra("serie") as? Serie
             val shouldAddToWatchlist = data.getBooleanExtra("addToWatchlist", false)
-            
+
             if (serie != null && shouldAddToWatchlist) {
                 addToWatchlist(serie)
             }
         }
     }
-    
+
+    private fun addToWatchlist(serie: Serie) {
+        if (watchlist.none { it.serie.id == serie.id }) {
+            watchlist.add(WatchlistSerie(serie))
+        }
+    }
+
+    private fun removeFromWatchlist(watchlistSerie: WatchlistSerie) {
+        watchlist.remove(watchlistSerie)
+    }
+
+    private fun updateWatchlistSettings(index: Int, episodesPerDay: Int, episodesPerWeek: Int, minutesPerDay: Int) {
+        val updatedSerie = watchlist[index]
+        updatedSerie.episodesPerDay = episodesPerDay
+        updatedSerie.episodesPerWeek = episodesPerWeek
+        updatedSerie.minutesPerDay = minutesPerDay
+    }
+
     companion object {
         const val ADD_TO_WATCHLIST_REQUEST_CODE = 100
     }
@@ -209,4 +149,3 @@ fun SearchBar(query: TextFieldValue, onQueryChanged: (TextFieldValue) -> Unit) {
         }
     )
 }
-

@@ -37,17 +37,7 @@ class SerieScreenActivity : ComponentActivity() {
             putExtra("addToWatchlist", true)
         }
         setResult(RESULT_OK, resultIntent)
-        isInWatchlist = true
-        // Rafraîchir l'interface pour mettre à jour le bouton
-        setContent {
-            BacklogSeriesTheme {
-                SerieScreen(
-                    serie = serie,
-                    isInWatchlist = isInWatchlist,
-                    onAddToWatchlist = { addToWatchlist() }
-                )
-            }
-        }
+        finish() // Fermer l'activité après l'ajout
     }
     
     override fun onBackPressed() {
