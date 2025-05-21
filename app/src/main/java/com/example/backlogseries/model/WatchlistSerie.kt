@@ -26,4 +26,19 @@ data class WatchlistSerie(
         val days = getDaysToComplete()
         return days / 7.0
     }
+
+    fun getFormattedTotalRuntime(): String {
+        val totalEpisodes = serie.number_of_episodes ?: 0
+        val episodeRuntime = serie.episode_run_time?.firstOrNull() ?: 45 // Durée moyenne par défaut
+
+        val totalRuntimeMinutes = totalEpisodes * episodeRuntime
+        val hours = totalRuntimeMinutes / 60
+        val minutes = totalRuntimeMinutes % 60
+
+        return if (hours > 0) {
+            "$hours h $minutes min"
+        } else {
+            "$minutes min"
+        }
+    }
 }

@@ -124,6 +124,8 @@ fun WatchlistSerieItem(
                 Text(text = "Saisons: ${watchlistSerie.serie.number_of_seasons}, Épisodes: ${watchlistSerie.serie.number_of_episodes}")
                 
                 val daysToComplete = watchlistSerie.getDaysToComplete()
+                val formattedRuntime = watchlistSerie.getFormattedTotalRuntime()
+                Text(text = "Temps total : $formattedRuntime")
                 Text(text = "Plan de visionnage : $daysToComplete jours")
             }
             
@@ -217,3 +219,4 @@ fun EditWatchlistDialog(
         }
     }
 }
+

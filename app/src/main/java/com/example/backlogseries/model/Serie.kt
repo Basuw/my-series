@@ -40,7 +40,7 @@ fun Serie.getTotalRuntime(calculated: MutableState<Boolean>): Int? {
         return runtimePerEpisode?.let { it * number_of_episodes }
     }else{
         Log.d("runtime fetched", "Runtime per episode: ")
-        return this.episode_run_time[0]
+        return this.episode_run_time[0]*this.number_of_episodes
     }
 }
 
