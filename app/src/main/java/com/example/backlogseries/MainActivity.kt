@@ -36,6 +36,9 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             BacklogSeriesTheme {
+                val serieService = SerieService(this)
+                var searchQuery by remember { mutableStateOf(TextFieldValue("")) }
+                var searchResults by remember { mutableStateOf<List<Serie>>(emptyList()) }
                 var selectedTab by remember { mutableStateOf(0) }
 
                 Column(modifier = Modifier.padding(10.dp)) {
@@ -57,12 +60,38 @@ class MainActivity : ComponentActivity() {
                     when (selectedTab) {
                         0 -> {
                             // Onglet Découvrir
-                            TopRatedSeriesScreen(
-                                serieService = SerieService(this@MainActivity),
-                                onSerieClick = { serie ->
-                                    navigateToSerieScreen(serie)
+                            // Barre de recherche
+                            SearchBar(
+                                query = searchQuery,
+                                onQueryChanged = { query ->
+                                    searchQuery = query
+                                    if (query.text.isNotEmpty()) {
+                                        lifecycleScope.launch {
+                                            delay(300) // Ajout d'un délai pour éviter les appels excessifs
+                                            searchResults = serieService.searchSeries(query.text)
+                                        }
+                                    } else {
+                                        searchResults = emptyList()
+                                    }
                                 }
                             )
+
+                            // Affichage des résultats de recherche ou des séries les mieux notées
+                            if (searchQuery.text.isNotEmpty()) {
+                                TopRatedSeriesScreen(
+                                    series = searchResults,
+                                    onSerieClick = { serie ->
+                                        fetchAndNavigateToSerieDetails(serieService, serie)
+                                    }
+                                )
+                            } else {
+                                TopRatedSeriesScreen(
+                                    serieService = serieService,
+                                    onSerieClick = { serie ->
+                                        fetchAndNavigateToSerieDetails(serieService, serie)
+                                    }
+                                )
+                            }
                         }
                         1 -> {
                             // Onglet Ma liste de lecture
@@ -81,6 +110,18 @@ class MainActivity : ComponentActivity() {
                         }
                     }
                 }
+            }
+        }
+    }
+
+    private fun fetchAndNavigateToSerieDetails(serieService: SerieService, serie: Serie) {
+        lifecycleScope.launch {
+            try {
+                val updatedSerie = serieService.getSerieDetails(serie.id) // Appel API pour récupérer les détails
+                Log.d("MainActivity", "Fetched serie details: $updatedSerie")
+                navigateToSerieScreen(updatedSerie) // Navigation avec la série mise à jour
+            } catch (e: Exception) {
+                e.printStackTrace()
             }
         }
     }
