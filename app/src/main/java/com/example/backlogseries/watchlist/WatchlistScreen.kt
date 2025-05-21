@@ -23,8 +23,23 @@ fun WatchlistScreen(
     watchlist: List<WatchlistSerie>,
     onSerieClick: (WatchlistSerie) -> Unit,
     onRemoveSerie: (WatchlistSerie) -> Unit,
-    onUpdateSettings: (index: Int, episodesPerDay: Int, episodesPerWeek: Int, minutesPerDay: Int) -> Unit
+    onUpdateSettings: (index: Int, minutesPerDay: Int) -> Unit
 ) {
+    var showEditDialog by remember { mutableStateOf(false) }
+    var selectedSerieIndex by remember { mutableStateOf(-1) }
+
+    // Afficher le popup d'édition si une série est sélectionnée
+    if (showEditDialog && selectedSerieIndex >= 0) {
+        EditWatchlistDialog(
+            watchlistSerie = watchlist[selectedSerieIndex],
+            onDismiss = { showEditDialog = false },
+            onSave = { minutesPerDay ->
+                onUpdateSettings(selectedSerieIndex, minutesPerDay)
+                showEditDialog = false
+            }
+        )
+    }
+
     Column {
         if (watchlist.isEmpty()) {
             Box(
@@ -41,7 +56,8 @@ fun WatchlistScreen(
                         onClick = { onSerieClick(watchlistSerie) },
                         onRemove = { onRemoveSerie(watchlistSerie) },
                         onEdit = {
-                            onUpdateSettings(index, watchlistSerie.episodesPerDay, watchlistSerie.episodesPerWeek, watchlistSerie.minutesPerDay)
+                            selectedSerieIndex = index
+                            showEditDialog = true // Ouvrir le popup d'édition
                         }
                     )
                 }
@@ -118,6 +134,84 @@ fun WatchlistSerieItem(
                 }
                 IconButton(onClick = { onRemove() }) {
                     Icon(Icons.Default.Delete, contentDescription = "Supprimer")
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun EditWatchlistDialog(
+    watchlistSerie: WatchlistSerie,
+    onDismiss: () -> Unit,
+    onSave: (minutesPerDay: Int) -> Unit
+) {
+    var minutes by remember { mutableStateOf(watchlistSerie.minutesPerDay) }
+    var isDailyMode by remember { mutableStateOf(true) } // Toggle entre jour et semaine
+
+    Dialog(onDismissRequest = onDismiss) {
+        Card(
+            modifier = Modifier.padding(16.dp),
+            elevation = CardDefaults.cardElevation(8.dp)
+        ) {
+            Column(
+                modifier = Modifier.padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Text(text = "Modifier le temps de visionnage", fontWeight = FontWeight.Bold)
+
+                // Toggle entre jour et semaine
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    TextButton(
+                        onClick = { isDailyMode = true },
+                        colors = ButtonDefaults.textButtonColors(
+                            contentColor = if (isDailyMode) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
+                        )
+                    ) {
+                        Text("Jour")
+                    }
+                    Spacer(modifier = Modifier.width(16.dp))
+                    TextButton(
+                        onClick = { isDailyMode = false },
+                        colors = ButtonDefaults.textButtonColors(
+                            contentColor = if (!isDailyMode) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
+                        )
+                    ) {
+                        Text("Semaine")
+                    }
+                }
+
+                // Champ pour modifier le temps de visionnage
+                OutlinedTextField(
+                    value = minutes.toString(),
+                    onValueChange = { minutes = it.toIntOrNull() ?: 0 },
+                    label = {
+                        Text(if (isDailyMode) "Minutes par jour" else "Minutes par semaine")
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End
+                ) {
+                    TextButton(onClick = onDismiss) {
+                        Text("Annuler")
+                    }
+                    TextButton(onClick = {
+                        // Convertir les minutes en minutes par jour si nécessaire
+                        val minutesPerDay = if (isDailyMode) {
+                            minutes
+                        } else {
+                            minutes / 7 // Conversion de semaine à jour
+                        }
+                        onSave(minutesPerDay)
+                    }) {
+                        Text("Sauvegarder")
+                    }
                 }
             }
         }

@@ -74,8 +74,8 @@ class MainActivity : ComponentActivity() {
                                 onRemoveSerie = { watchlistSerie ->
                                     removeFromWatchlist(watchlistSerie)
                                 },
-                                onUpdateSettings = { index, episodesPerDay, episodesPerWeek, minutesPerDay ->
-                                    updateWatchlistSettings(index, episodesPerDay, episodesPerWeek, minutesPerDay)
+                                onUpdateSettings = { index, minutesPerDay ->
+                                    updateWatchlistSettings(index, minutesPerDay)
                                 }
                             )
                         }
@@ -115,10 +115,8 @@ class MainActivity : ComponentActivity() {
         watchlist.remove(watchlistSerie)
     }
 
-    private fun updateWatchlistSettings(index: Int, episodesPerDay: Int, episodesPerWeek: Int, minutesPerDay: Int) {
+    private fun updateWatchlistSettings(index: Int, minutesPerDay: Int) {
         val updatedSerie = watchlist[index]
-        updatedSerie.episodesPerDay = episodesPerDay
-        updatedSerie.episodesPerWeek = episodesPerWeek
         updatedSerie.minutesPerDay = minutesPerDay
     }
 
@@ -149,3 +147,4 @@ fun SearchBar(query: TextFieldValue, onQueryChanged: (TextFieldValue) -> Unit) {
         }
     )
 }
+

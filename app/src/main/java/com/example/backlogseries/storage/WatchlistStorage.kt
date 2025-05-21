@@ -13,14 +13,27 @@ class WatchlistStorage(context: Context) {
     private val gson = Gson()
 
     fun saveWatchlist(watchlist: List<WatchlistSerie>) {
-        val json = gson.toJson(watchlist)
-        sharedPreferences.edit().putString(KEY_WATCHLIST, json).apply()
+        val editor = sharedPreferences.edit()
+        val json = gson.toJson(watchlist.map {
+            mapOf(
+                "serie" to it.serie,
+                "minutesPerDay" to it.minutesPerDay
+            )
+        })
+        editor.putString(KEY_WATCHLIST, json)
+        editor.apply()
     }
 
     fun loadWatchlist(): List<WatchlistSerie> {
         val json = sharedPreferences.getString(KEY_WATCHLIST, null) ?: return emptyList()
-        val type = object : TypeToken<List<WatchlistSerie>>() {}.type
-        return gson.fromJson(json, type) ?: emptyList()
+        val listType = object : TypeToken<List<Map<String, Any>>>() {}.type
+        val rawList: List<Map<String, Any>> = gson.fromJson(json, listType)
+        return rawList.map {
+            WatchlistSerie(
+                serie = gson.fromJson(gson.toJson(it["serie"]), Serie::class.java),
+                minutesPerDay = (it["minutesPerDay"] as Double).toInt()
+            )
+        }
     }
 
     fun addSerieToWatchlist(watchlist: MutableList<WatchlistSerie>, serie: Serie): Boolean {
@@ -44,25 +57,6 @@ class WatchlistStorage(context: Context) {
         
         // Si la taille a changé, on a supprimé une série
         if (watchlist.size != initialSize) {
-            saveWatchlist(watchlist)
-            return true
-        }
-        return false
-    }
-
-    fun updateWatchlistSettings(
-        watchlist: MutableList<WatchlistSerie>,
-        index: Int, 
-        episodesPerDay: Int, 
-        episodesPerWeek: Int, 
-        minutesPerDay: Int
-    ): Boolean {
-        if (index in watchlist.indices) {
-            watchlist[index] = watchlist[index].copy(
-                episodesPerDay = episodesPerDay,
-                episodesPerWeek = episodesPerWeek,
-                minutesPerDay = minutesPerDay
-            )
             saveWatchlist(watchlist)
             return true
         }
