@@ -36,11 +36,12 @@ On the Welcome screen, select "Open" (or "Open an Existing Project").
 Navigate to the directory where you cloned the repository and select the project folder.
 Click "OK".
 
-4. Gradle Sync
+3. Gradle Sync
 Android Studio will automatically start building the project and syncing dependencies using Gradle. This might take a few minutes, especially the first time.
 Monitor the "Build" output window for progress and any errors. Resolve any SDK or build tool version issues if prompted (Android Studio often offers quick fixes).
 
-5. Set Up a Target Device/Emulator
+
+4. Set Up a Target Device/Emulator
 You need an Android device or emulator to run the app:
 
 Emulator (Android Virtual Device - AVD):
@@ -54,6 +55,7 @@ Physical Device:
 Enable Developer Options and USB Debugging on your Android device. (Search online for "enable developer options [your device model]" if unsure).
 Connect your device to your computer via USB.
 Authorize the computer on your device if prompted.
+
 5. Build and Run the Application
 Once Gradle sync is complete and your device/emulator is ready, select it from the target device dropdown menu near the top of Android Studio (it usually says "app" next to a device name).
 Click the Run 'app' button (the green play icon ▶️) or select Run > Run 'app' from the menu.
