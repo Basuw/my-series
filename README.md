@@ -26,35 +26,8 @@ Before starting, ensure you have:
 Open your terminal and clone the project:
 
 ```bash
-git clone <[REPOSITORY_URL](https://github.com/Basuw/my-series/)>
+git clone https://github.com/Basuw/my-series
 cd my-series
-```
-
-Okay, here's a shortened installation guide in English, in Markdown format:
-
-Markdown
-
-# Quick Installation Guide for a Kotlin App from a Git Repo
-
-## Prerequisites
-
-Before starting, ensure you have:
-
-1.  **Git:** For cloning the repository.
-2.  **Java Development Kit (JDK):** Version 11, 17, or newer is generally recommended.
-3.  **Build Tool (Usually included):** The project will likely use **Gradle** (with `./gradlew` or `gradlew.bat` wrapper) or **Maven** (with `./mvnw` or `mvnw.cmd` wrapper).
-
----
-
-## Installation & Launch Steps
-
-### 1. Clone the Repository
-
-Open your terminal and clone the project:
-
-```bash
-git clone <REPOSITORY_URL>
-cd <PROJECT_DIRECTORY_NAME>
 ```
 
 2. Open the Project in Android Studio
